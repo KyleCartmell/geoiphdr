@@ -3,14 +3,13 @@ var injecting = false,
   ipAddressIndex = 0,
   header = { "name": "X-Forwarded-For", "value": "127.0.0.1" }
   injector = function (details) {
-    console.log("injecting -- " + header.name + ": " + header.value);
     details.requestHeaders.push(header);
     return { "requestHeaders": details.requestHeaders };
   },
   startInjecting = function (headerName, headerValue) {
     header.name = headerName;
     header.value = headerValue;
-    console.log("header updated")
+    console.log("injecting header -- " + header.name + ": " + header.value);
     if(!injecting) {
       console.log("started injecting");
       chrome.webRequest.onBeforeSendHeaders.addListener( injector,
@@ -21,7 +20,7 @@ var injecting = false,
   stopInjecting = function () {
     if(!injecting) return;
     console.log("stopped injecting");
-    chrome.extension.onBeforeRequest.removeListener(injector);
+    chrome.webRequest.onBeforeSendHeaders.removeListener(injector);
     injecting = false;
   };
 
